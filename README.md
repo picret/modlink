@@ -1,16 +1,3 @@
-[github_release]: https://img.shields.io/github/release/picret/modlink.svg?logo=github&logoColor=white
-[pypi_version]: https://img.shields.io/pypi/v/modlink.svg?logo=python&logoColor=white
-[python_versions]: https://img.shields.io/pypi/pyversions/modlink.svg?logo=python&logoColor=white
-[github_license]: https://img.shields.io/github/license/picret/modlink.svg?logo=github&logoColor=white
-[github_action]: https://github.com/picret/modlink/actions/workflows/tests.yml/badge.svg
-
-[![GitHub Release][github_release]](https://github.com/picret/modlink/releases/)
-[![PyPI Version][pypi_version]](https://pypi.org/project/modlink/)
-[![Python Versions][python_versions]](https://pypi.org/project/modlink/)
-[![License][github_license]](https://github.com/picret/modlink/blob/main/LICENSE)
-<br>
-[![Tests][github_action]](https://github.com/picret/modlink/actions/workflows/tests.yml)
-
 # ModLink
 
 ModLink is a library designed to give agents a means to communicate.
