@@ -2,43 +2,59 @@ import sys
 import subprocess
 import re
 import toml
+from packaging.version import Version, InvalidVersion
 
-def get_latest_release() -> str:
+def to_version(name: str) -> Version:
   try:
-    latest_tag = subprocess.check_output([
+    if name.startswith("v"):
+      name = name[1:]
+    return Version(name)
+  except InvalidVersion:
+    print(f"Error: Tagged version '{name}' does not conform to pep-0440.")
+
+def get_latest_tag() -> str:
+  try:
+    return subprocess.check_output([
       "git", "describe", "--tags", "--abbrev=0"
-    ]).strip().decode("utf-8")
-    return latest_tag
+    ]).strip().decode("utf-8").strip()
   except subprocess.CalledProcessError:
     print("Error: Could not get the latest Git tag.")
     return None
 
-def update_version_in_init(version):
+def update_package(version: str) -> None:
   init_file = "modlink/__init__.py"
   with open(init_file, "r") as file:
     content = file.read()
 
   new_content = re.sub(r'__version__ = "[^"]+"', f'__version__ = "{version}"', content)
-  
+
   with open(init_file, "w") as file:
     file.write(new_content)
+  print(f"Updated {init_file} __version__ = \"{version}\"")
 
 def update_pyproject(version: str):
   with open('pyproject.toml', 'r') as f:
     config = toml.load(f)
 
   config['tool']['poetry']['version'] = version
-  
+
   with open('pyproject.toml', 'w') as f:
     toml.dump(config, f)
+  print(f"Updated pyproject.toml version = \"{version_str}\"")
 
 if __name__ == '__main__':
-  latest_release = get_latest_release()
-  if latest_release is None:
+  # check if release is coming from argument
+  if len(sys.argv) > 3:
+    print(f"Error: Only one argument is allowed. {sys.argv[1:]}")
     sys.exit(1)
 
-  version = latest_release.split('-')[0]
-  update_pyproject(version)
-  print(f"Updated pyproject.toml to version {version}")
+  if len(sys.argv) == 2:
+    version = to_version(sys.argv[1])
+  else:
+    version = to_version(get_latest_tag())
 
-
+  print(f"Latest release: {version}")
+  version_str = str(version)
+  update_package(version_str)
+  update_pyproject(version_str)
+  print("Prepared for release.")

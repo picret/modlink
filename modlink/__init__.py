@@ -1,7 +1,6 @@
 # modlink/__init__.py
 
-# Automatically updated by scripts/prepare_release.py.
-# Do not manually edit here.
+# Do not manually edit here. This is updated by scripts/prepare_release.py.
 __version__ = "0.1.0"
 
 from .agent import Agent, agent_name
