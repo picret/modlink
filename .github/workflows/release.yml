@@ -20,10 +20,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Poetry
+      - name: Install dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python - -y
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry install
 
       - name: Prepare release
         id: prepare_release

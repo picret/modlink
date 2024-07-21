@@ -24,11 +24,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python - -y
-
-      - name: Update PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry install
 
       - name: Run lint
         run: |
@@ -36,4 +36,4 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run pytest
+          pytest
