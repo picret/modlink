@@ -22,17 +22,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install poetry
           poetry install
 
       - name: Prepare release
         id: prepare_release
-        run: python scripts/prepare_release.py
+        run: poetry run python scripts/prepare_release.py
 
       - name: Publish release (Conditional)
         if: steps.prepare_release.outputs.release == 'true'
         run: |
-          python scripts/commit_changes.py "Release ${{ steps.prepare_release.outputs.version }}"
+          poetry run python scripts/commit_changes.py "Release ${{ steps.prepare_release.outputs.version }}"
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish --build
