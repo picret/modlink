@@ -22,8 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python - -y
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          python -m pip install --upgrade pip
+          pip install poetry
           poetry install
 
       - name: Prepare release
