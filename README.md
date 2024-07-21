@@ -1,20 +1,13 @@
+[![PyPI version](https://img.shields.io/pypi/v/modlink.svg)](https://pypi.org/project/modlink/)
+[![Python versions](https://img.shields.io/pypi/pyversions/modlink.svg)](https://pypi.org/project/modlink/)
+[![License](https://img.shields.io/pypi/l/modlink.svg)](https://pypi.org/project/modlink/)
+[![Wheel](https://img.shields.io/pypi/wheel/modlink.svg)](https://pypi.org/project/modlink/)
+
 # ModLink
 
 ModLink is a library designed to give agents a means to communicate.
 
 See the [PATTERN.md](PATTERN.md) for more information on the pattern used in ModLink.
-
-## Installation
-
-You can install ModLink using pip
-```sh
-pip install modlink
-```
-
-Or, if you're using Poetry
-```sh
-poetry add modlink
-```
 
 ## Usage
 
