@@ -55,12 +55,11 @@ def print_version_output(version: Version):
     f"version={version}",
     f"prerelease={'true' if version.is_prerelease else 'false'}"
   ])
+  print(output)
   env_file_path = os.getenv('GITHUB_OUTPUT')
   if env_file_path:
     with open(env_file_path, 'w') as env_file:
       env_file.write(output + '\n')
-  else:
-    print(output)
 
 
 if __name__ == '__main__':
@@ -74,9 +73,7 @@ if __name__ == '__main__':
   else:
     version = to_version(get_latest_tag())
 
-  print(f"Latest release: {version}")
   version_str = str(version)
   update_package(version_str)
   update_pyproject(version_str)
-
   print_version_output(version)
