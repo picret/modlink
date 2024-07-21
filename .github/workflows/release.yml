@@ -1,0 +1,43 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python - -y
+
+      - name: Update PATH for Poetry
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Run scripts/prepare_release.py
+        id: prepare_release
+        run: python scripts/prepare_release.py ${{ github.ref }}
+
+      - name: Publish changes (Conditional)
+        if: steps.prepare_release.outputs.release == 'true'
+        run: |
+          git config --global user.email "
+          git config --global user.name "
+          
+        run: poetry build
+
+      - name: Publish to PyPI (Conditional)
+        if: steps.prepare_release.outputs.release == 'true'
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+        run: poetry publish

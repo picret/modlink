@@ -4,6 +4,7 @@ import re
 import toml
 from packaging.version import Version, InvalidVersion
 
+
 def to_version(name: str) -> Version:
   try:
     if name.startswith("v"):
@@ -11,6 +12,8 @@ def to_version(name: str) -> Version:
     return Version(name)
   except InvalidVersion:
     print(f"Error: Tagged version '{name}' does not conform to pep-0440.")
+    sys.exit(1)
+
 
 def get_latest_tag() -> str:
   try:
@@ -19,7 +22,8 @@ def get_latest_tag() -> str:
     ]).strip().decode("utf-8").strip()
   except subprocess.CalledProcessError:
     print("Error: Could not get the latest Git tag.")
-    return None
+    sys.exit(1)
+
 
 def update_package(version: str) -> None:
   init_file = "modlink/__init__.py"
@@ -32,6 +36,7 @@ def update_package(version: str) -> None:
     file.write(new_content)
   print(f"Updated {init_file} __version__ = \"{version}\"")
 
+
 def update_pyproject(version: str):
   with open('pyproject.toml', 'r') as f:
     config = toml.load(f)
@@ -41,6 +46,11 @@ def update_pyproject(version: str):
   with open('pyproject.toml', 'w') as f:
     toml.dump(config, f)
   print(f"Updated pyproject.toml version = \"{version_str}\"")
+
+
+def set_output(name, value):
+  print(f"::set-output name={name}::{value}")
+
 
 if __name__ == '__main__':
   # check if release is coming from argument
@@ -57,4 +67,11 @@ if __name__ == '__main__':
   version_str = str(version)
   update_package(version_str)
   update_pyproject(version_str)
+
+  if version.is_prerelease:
+    set_output("prerelease", "true")
+  else:
+    set_output("prerelease", "false")
+  set_output("release", "true")
+
   print("Prepared for release.")
