@@ -1,3 +1,5 @@
+# .github/workflows/release.yml
+
 name: Publish to PyPI
 
 on:
@@ -29,9 +31,7 @@ jobs:
 
       - name: Publish release (Conditional)
         if: steps.prepare_release.outputs.release == 'true'
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
         run: |
           python scripts/commit_changes.py "Release ${{ steps.prepare_release.outputs.version }}"
-          poetry build
-          poetry publish
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+          poetry publish --build
