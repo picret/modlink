@@ -11,7 +11,25 @@ def get_current_branch() -> str:
   )
   return result.stdout.strip()
 
-def commit_and_push_changes(commit_message: str):
+
+def has_changes() -> bool:
+  result = subprocess.run(
+    ["git", "diff-index", "--quiet", "HEAD", "--"],
+    capture_output=True,
+  )
+  return result.returncode != 0
+
+
+if __name__ == '__main__':
+  if len(sys.argv) != 2:
+    print("Error: Commit message required.")
+    sys.exit(1)
+  commit_message = sys.argv[1]
+
+  if not has_changes():
+    print("No changes to commit.")
+    sys.exit(0)
+
   try:
     current_branch = get_current_branch()
     subprocess.run(["git", "add", "."], check=True)
@@ -20,11 +38,3 @@ def commit_and_push_changes(commit_message: str):
   except subprocess.CalledProcessError as e:
     print(f"Error: {e}")
     sys.exit(1)
-
-if __name__ == '__main__':
-  if len(sys.argv) != 2:
-    print("Error: Commit message required.")
-    sys.exit(1)
-
-  commit_message = sys.argv[1]
-  commit_and_push_changes(commit_message)

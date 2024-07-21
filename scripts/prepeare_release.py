@@ -68,10 +68,11 @@ if __name__ == '__main__':
   update_package(version_str)
   update_pyproject(version_str)
 
+  set_output("release", "true")
+  set_output("version", version_str)
   if version.is_prerelease:
     set_output("prerelease", "true")
   else:
     set_output("prerelease", "false")
-  set_output("release", "true")
 
   print("Prepared for release.")
