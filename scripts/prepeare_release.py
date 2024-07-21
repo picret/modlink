@@ -48,8 +48,15 @@ def update_pyproject(version: str):
   print(f"Updated pyproject.toml version = \"{version_str}\"")
 
 
-def set_output(name, value):
-  print(f"::set-output name={name}::{value}")
+def print_version_output(version: Version):
+  def set_output(name: str, value: str):
+    print(f"::set-output name={name}::{value}")
+  set_output("release", "true")
+  set_output("version", str(version))
+  if version.is_prerelease:
+    set_output("prerelease", "true")
+  else:
+    set_output("prerelease", "false")
 
 
 if __name__ == '__main__':
@@ -68,11 +75,6 @@ if __name__ == '__main__':
   update_package(version_str)
   update_pyproject(version_str)
 
-  set_output("release", "true")
-  set_output("version", version_str)
-  if version.is_prerelease:
-    set_output("prerelease", "true")
-  else:
-    set_output("prerelease", "false")
+  print_version_output(version)
 
   print("Prepared for release.")
