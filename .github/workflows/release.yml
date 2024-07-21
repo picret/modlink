@@ -32,6 +32,9 @@ jobs:
       - name: Publish release (Conditional)
         if: steps.prepare_release.outputs.release == 'true'
         run: |
-          poetry run python scripts/commit_changes.py "Release ${{ steps.prepare_release.outputs.version }}"
+          git config --global user.name 'PyPI Release Bot'
+          git config --global user.email 'release-bot@users.noreply.github.com'
+          poetry run python scripts/commit_and_push_changes.py \
+            "Release ${{ steps.prepare_release.outputs.version }}"
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish --build

@@ -1,3 +1,4 @@
+import os
 import sys
 import subprocess
 import re
@@ -11,7 +12,7 @@ def to_version(name: str) -> Version:
       name = name[1:]
     return Version(name)
   except InvalidVersion:
-    print(f"Error: Tagged version '{name}' does not conform to pep-0440.")
+    print(f"Exit: Tag '{name}' does not confom to pep-440 PyPi release versions.")
     sys.exit(1)
 
 
@@ -49,14 +50,17 @@ def update_pyproject(version: str):
 
 
 def print_version_output(version: Version):
-  def set_output(name: str, value: str):
-    print(f"::set-output name={name}::{value}")
-  set_output("release", "true")
-  set_output("version", str(version))
-  if version.is_prerelease:
-    set_output("prerelease", "true")
+  output = '\n'.join([
+    "release=true",
+    f"version={version}",
+    f"prerelease={'true' if version.is_prerelease else 'false'}"
+  ])
+  env_file_path = os.getenv('GITHUB_OUTPUT')
+  if env_file_path:
+    with open(env_file_path, 'w') as env_file:
+      env_file.write(output + '\n')
   else:
-    set_output("prerelease", "false")
+    print(output)
 
 
 if __name__ == '__main__':
@@ -76,5 +80,3 @@ if __name__ == '__main__':
   update_pyproject(version_str)
 
   print_version_output(version)
-
-  print("Prepared for release.")
