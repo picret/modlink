@@ -1,9 +1,10 @@
 from abc import ABC
 from typing import Dict, Generic, Type, TypeVar
 
+from modlink.tools.action_registry import ActionRegistry
+
 from .action import Action
 from .context import Context
-from .tools.action_registry import ActionRegistry
 
 
 def agent_name(name: str, role: str):

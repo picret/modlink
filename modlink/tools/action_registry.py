@@ -1,7 +1,8 @@
 import json
-from typing import Dict, List, Type
+from typing import Dict, List, Type, TYPE_CHECKING
 
-from modlink.action import Action
+if TYPE_CHECKING:
+    from modlink.action import Action
 
 
 class ActionRegistry:
