@@ -3,7 +3,6 @@ from typing import Dict, Generic, Type, TypeVar
 
 from .action import Action
 from .context import Context
-from .tools.action_registry import ActionRegistry
 
 
 def agent_name(name: str, role: str):
@@ -38,7 +37,8 @@ class Agent(Generic[TContext], ABC):
 
   def __init__(self):
     self._context: TContext = None
-    self._action_registry = ActionRegistry()
+    from modlink.tools import ActionRegistry
+    self._action_registry: ActionRegistry = ActionRegistry()
 
   @property
   def context(self) -> TContext:

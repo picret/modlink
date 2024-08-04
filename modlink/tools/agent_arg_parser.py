@@ -10,7 +10,7 @@ class AgentArgParser:
   Parses command line arguments for an agent so that it can perform an action.
   """
 
-  def __init__(self, agent: Agent):
+  def __init__(self, agent: 'Agent'):
     self.agent = agent
     self.description = agent.describe()
     self.actions = self.description['actions']

@@ -1,7 +1,6 @@
 import unittest
 
-from modlink.action import Action, action_name
-from modlink.context import Context
+from modlink import Action, action_name, Context
 from examples.example_agent import ExampleAgent, ExampleContext, ReplaceAction
 
 
