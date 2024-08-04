@@ -1,8 +1,6 @@
 from abc import ABC
 from typing import Dict, Generic, Type, TypeVar
 
-from modlink.tools.action_registry import ActionRegistry
-
 from .action import Action
 from .context import Context
 
@@ -39,7 +37,8 @@ class Agent(Generic[TContext], ABC):
 
   def __init__(self):
     self._context: TContext = None
-    self._action_registry = ActionRegistry()
+    from modlink.tools import ActionRegistry
+    self._action_registry: ActionRegistry = ActionRegistry()
 
   @property
   def context(self) -> TContext:
