@@ -21,3 +21,9 @@ conda activate modlink
 pip install -e .python
 examples/example_agent.py
 ```
+
+Format the code with `black`.
+
+```bash
+black .
+```

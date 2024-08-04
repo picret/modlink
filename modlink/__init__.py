@@ -9,8 +9,10 @@ from .context import Context
 from .platform import Platform
 
 __all__ = [
-  'Agent', 'agent_name',
-  'Action', 'action_name',
-  'Context',
-  'Platform',
+    "Agent",
+    "agent_name",
+    "Action",
+    "action_name",
+    "Context",
+    "Platform",
 ]
