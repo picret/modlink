@@ -27,3 +27,19 @@ Format the code with `black`.
 ```bash
 black .
 ```
+
+## Releases
+
+We use [SemVer](https://semver.org/) for versioning. For the versions available, see the tags on this repository or go to the [releases page](https://github.com/picret/modlink/releases).
+
+To generate a new release, you simply need to generate a tag.
+
+1. Go to https://github.com/picret/modlink/releases/new
+2. Set tag to `X.Y.Z`
+3. Set title to `X.Y.Z`
+4. Click the `Generate release notes`
+5. Add a title to the description `X.Y.Z (YYYY-MM-DD)`
+6. Check the `This is a pre-release` if it is a pre-release
+7. Click `Publish release`
+8. Verify release runs successfully https://github.com/picret/modlink/actions/workflows/release.yml
+9. Verify release is available on PyPI https://pypi.org/project/modlink
