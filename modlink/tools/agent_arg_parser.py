@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import logging
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from modlink import Agent, Action
 
@@ -40,6 +40,26 @@ class AgentArgParser:
                 if "type" in prop_details:
                     choices = None
                     arg_type = self._get_arg_type(prop_details["type"])
+                elif "anyOf" in prop_details or "oneOf" in prop_details:
+                    # Handling Optional and Literal cases
+                    sub_schemas = prop_details.get("anyOf") or prop_details.get("oneOf")
+                    possible_types = [
+                        self._get_arg_type(schema["type"])
+                        for schema in sub_schemas
+                        if "type" in schema and schema["type"] != "null"
+                    ]
+
+                    # If Literal (enum), get choices
+                    if len(possible_types) == 1:
+                        arg_type = possible_types[0]
+                    else:
+                        arg_type = Union[tuple(possible_types)]
+
+                    enum_schema = next(
+                        (schema for schema in sub_schemas if "enum" in schema), None
+                    )
+                    if enum_schema:
+                        choices = enum_schema["enum"]
                 elif "allOf" in prop_details:
                     ref = prop_details["allOf"][0]["$ref"]
                     arg_type = str
@@ -77,10 +97,16 @@ class AgentArgParser:
             return str
         elif type_str == "array":
             return lambda x: x.split(";")
+        elif type_str == "null":
+            return type(None)
         else:
             raise ValueError(f"Unsupported type: {type_str}")
 
     def parse_args(self) -> Action | None:
+        if self.agent.context is None:
+            raise RuntimeError(
+                "The agent must be attached to a context before parsing arguments."
+            )
         args = self.parser.parse_args()
         if args.action is None:
             self.parser.print_help()
@@ -92,6 +118,6 @@ class AgentArgParser:
     def parse_and_perform(self):
         action = self.parse_args()
         if action is not None:
-            self.agent.perform(action)
+            return self.agent.perform(action)
         else:
             logging.error(f"Unable to parse action {action}")
