@@ -1,4 +1,4 @@
-from example_agent import ExampleAgent, ExampleContext
+from .example_agent import ExampleAgent, ExampleContext
 from modlink.tools.agent_arg_parser import AgentArgParser
 
 

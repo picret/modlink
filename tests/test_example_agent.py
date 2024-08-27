@@ -14,37 +14,50 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.detach()
 
     def test_agent_description(self):
+        """Test the agent description is correct."""
         description = self.agent.describe()
         self.assertEqual(description["name"], "example-agent")
         self.assertEqual(description["role"], "Manages text state")
-        self.assertEqual(len(description["actions"]), 2)
+        self.assertEqual(len(description["actions"]), 3)
 
     def test_perform_action(self):
+        """Test the agent can perform an action."""
         action = ReplaceAction(text="Action performed successfully")
-        self.agent.perform(action)
+
+        text = self.agent.perform(action)
+
         self.assertEqual(action.text, self.context.text)
+        self.assertEqual(action.text, text)
 
     async def test_perform_async_action(self):
+        """Test the agent can perform an action asynchronously."""
         self.agent.attach(self.context)
         action = ReplaceAction(text="Async action performed successfully")
-        await self.agent.perform_async(action)
+
+        text = await self.agent.perform_async(action)
+
         self.assertEqual(action.text, self.context.text)
+        self.assertEqual(action.text, text)
 
     def test_unsupported_action(self):
+        """Test an unsupported action is performed."""
+
         @action_name(
-            name="fake-action",
+            name="unknown_action",
             description="An action that is not supported by the agent",
         )
-        class FakeAction(Action):
+        class UnknownAction(Action):
             def perform(self, _: Context) -> None:
                 pass
 
-        action = FakeAction()
+        action = UnknownAction()
         with self.assertRaises(ValueError) as context:
             self.agent.perform(action)
-        self.assertEqual(str(context.exception), "Unsupported action: fake-action")
+        self.assertEqual(str(context.exception), "Unsupported action: unknown_action")
 
     def test_needs_action_name(self):
+        """Test an action is not decorated with @action_name."""
+
         class IncorrectAction(Action):
             def perform(self, _: Context) -> None:
                 pass
@@ -58,6 +71,7 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         )
 
     def test_detach_agent(self):
+        """Test that the agent can be detached from a context."""
         self.agent.detach()
         with self.assertRaises(RuntimeError) as context:
             self.agent.context

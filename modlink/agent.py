@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict, Generic, Type, TypeVar
+from typing import Any, Dict, Generic, Type, TypeVar
 
 from .action import Action
 from .context import Context
@@ -64,18 +64,18 @@ class Agent(Generic[TContext], ABC):
         """
         self._context = context
 
-    def perform(self, action: "Action"):
+    def perform(self, action: "Action") -> Any:
         """
         Perform the given action using the current context.
         """
         self._action_registry.validate(action)
-        action.perform(self.context)
+        return action.perform(self.context)
 
-    async def perform_async(self, action: "Action"):
+    async def perform_async(self, action: "Action") -> Any:
         """
         Executes an action asynchronously.
         """
-        self.perform(action)
+        return self.perform(action)
 
     def detach(self):
         """

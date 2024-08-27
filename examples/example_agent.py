@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import Field
 
 import modlink as mk
@@ -22,8 +23,11 @@ class ExampleAgent(mk.Agent[ExampleContext]):
 
     def attach(self, context: ExampleContext):
         super().attach(context)
-        self._action_registry.add(ReplaceAction)
-        self._action_registry.add(ConcatAction)
+        self._action_registry.add_all(
+            ReplaceAction,
+            ConcatAction,
+            PadAction,
+        )
 
 
 @mk.action_name(
@@ -49,6 +53,40 @@ class ConcatAction(mk.Action):
     def perform(self, context: ExampleContext) -> str:
         context._text += self.text
         print(f"Action result: {context._text}")
+        return context._text
+
+
+@mk.action_name(
+    name="pad",
+    description="Pads the text with text.",
+)
+class PadAction(mk.Action):
+    text: Optional[str] = Field(
+        default=" ",
+        description=("Text to pad with. Defaults to a space."),
+    )
+    start: Optional[int] = Field(
+        default=0,
+        description=(
+            "Text multiplier to pad to the start of the text. " "Defaults to zero."
+        ),
+    )
+    end: Optional[int] = Field(
+        default=0,
+        description=(
+            "Text multiplier to add to the end of the text. " "Defaults to zero."
+        ),
+    )
+
+    def perform(self, context: ExampleContext) -> str:
+        text = context._text
+        if self.start and self.start > 0:
+            text = self.text * self.start + text
+        if self.end and self.end > 0:
+            text = text + self.text * self.end
+        context._text = text
+
+        print(f"Padded text result: {text}")
         return context._text
 
 
