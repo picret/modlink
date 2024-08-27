@@ -14,14 +14,14 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.detach()
 
     def test_agent_description(self):
-        """Test that the agent description is correct."""
+        """Test the agent description is correct."""
         description = self.agent.describe()
         self.assertEqual(description["name"], "example-agent")
         self.assertEqual(description["role"], "Manages text state")
         self.assertEqual(len(description["actions"]), 3)
 
     def test_perform_action(self):
-        """Test that the agent can perform an action."""
+        """Test the agent can perform an action."""
         action = ReplaceAction(text="Action performed successfully")
 
         text = self.agent.perform(action)
@@ -30,7 +30,7 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(action.text, text)
 
     async def test_perform_async_action(self):
-        """Test that the agent can perform an action asynchronously."""
+        """Test the agent can perform an action asynchronously."""
         self.agent.attach(self.context)
         action = ReplaceAction(text="Async action performed successfully")
 
@@ -40,7 +40,8 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(action.text, text)
 
     def test_unsupported_action(self):
-        """Test that an error is raised when an unsupported action is performed."""
+        """Test an unsupported action is performed."""
+
         @action_name(
             name="unknown_action",
             description="An action that is not supported by the agent",
@@ -55,7 +56,8 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(str(context.exception), "Unsupported action: unknown_action")
 
     def test_needs_action_name(self):
-        """Test that an error is raised when an action is not decorated with @action_name."""
+        """Test an action is not decorated with @action_name."""
+
         class IncorrectAction(Action):
             def perform(self, _: Context) -> None:
                 pass
