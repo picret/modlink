@@ -75,7 +75,7 @@ class Agent(Generic[TContext], ABC):
         """
         Executes an action asynchronously.
         """
-        self.perform(action)
+        return self.perform(action)
 
     def detach(self):
         """
