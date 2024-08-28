@@ -7,5 +7,6 @@ if __name__ == "__main__":
     agent = ExampleAgent()
     agent.attach(ExampleContext())
     arg_parser = AgentArgParser(agent)
-    arg_parser.parse_and_perform()
+    result = arg_parser.parse_and_perform()
+    print(f"Action result: {result}")
     agent.detach()

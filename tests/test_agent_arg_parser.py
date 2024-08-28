@@ -54,6 +54,17 @@ class TestAgentArgParser(unittest.TestCase):
         text = self.parser.parse_and_perform()
         self.assertEqual(text, "Initial state is padded is padded is padded")
 
+    @patch(
+        "argparse.ArgumentParser.parse_args",
+        return_value=Namespace(action="case", operation="upper"),
+    )
+    def test_case_action_enum_parameters(self, _):
+        """Test that replace action is parsed correctly when context is present."""
+        context = ExampleContext()
+        self.agent.attach(context)
+        text = self.parser.parse_and_perform()
+        self.assertEqual(text, "INITIAL STATE")
+
 
 if __name__ == "__main__":
     unittest.main()
