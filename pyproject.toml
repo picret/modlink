@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "modlink"
-version = "0.1.0a2"
+version = "0.1.0a4"
 description = "Modular links library for developing agent communication."
 authors = [ "Kyle Madsen <kyle.mdsn@gmail.com>",]
 readme = "README.md"
