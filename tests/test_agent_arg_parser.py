@@ -1,11 +1,9 @@
 from argparse import Namespace
 import unittest
 from unittest.mock import patch
-from examples.example_agent import (
-    ExampleAgent,
-    ExampleContext,
-    ReplaceAction,
-)
+from example.actions.replace import ReplaceAction
+from example.agent import ExampleAgent
+from example.context import ExampleContext
 from modlink.tools import AgentArgParser
 
 
@@ -28,7 +26,8 @@ class TestAgentArgParser(unittest.TestCase):
         """Test that replace action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
-        action = self.parser.parse_args()
+        action: ReplaceAction = self.parser.parse_args()
+
         self.assertIsInstance(action, ReplaceAction)
         self.assertEqual(action.text, "New Text State")
 
@@ -40,7 +39,7 @@ class TestAgentArgParser(unittest.TestCase):
         """Test that replace action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
-        text = self.parser.parse_and_perform()
+        text: str = self.parser.parse_and_perform()
         self.assertEqual(text, "xxxInitial statex")
 
     @patch(
@@ -51,7 +50,7 @@ class TestAgentArgParser(unittest.TestCase):
         """Test that replace action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
-        text = self.parser.parse_and_perform()
+        text: str = self.parser.parse_and_perform()
         self.assertEqual(text, "Initial state is padded is padded is padded")
 
     @patch(
@@ -62,7 +61,7 @@ class TestAgentArgParser(unittest.TestCase):
         """Test that replace action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
-        text = self.parser.parse_and_perform()
+        text: str = self.parser.parse_and_perform()
         self.assertEqual(text, "INITIAL STATE")
 
 
