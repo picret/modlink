@@ -1,29 +1,33 @@
 import unittest
 
 from modlink import Action, action_name, Context
-from examples.example_agent import ExampleAgent, ExampleContext, ReplaceAction
+from example.context import ExampleContext
+from example.agent import ExampleAgent
+from example.actions.replace import ReplaceAction
 
 
 class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.agent = ExampleAgent()
         self.context = ExampleContext()
-        self.agent.attach(self.context)
+        self.agent = ExampleAgent()
 
     def tearDown(self):
         self.agent.detach()
 
     def test_agent_description(self):
         """Test the agent description is correct."""
+        self.agent.attach(self.context)
         description = self.agent.describe()
+
         self.assertEqual(description["name"], "example-agent")
-        self.assertEqual(description["role"], "Manages text state")
+        self.assertEqual(description["role"], "Edits text state")
         self.assertEqual(len(description["actions"]), 4)
 
     def test_perform_action(self):
         """Test the agent can perform an action."""
         action = ReplaceAction(text="Action performed successfully")
 
+        self.agent.attach(self.context)
         text = self.agent.perform(action)
 
         self.assertEqual(action.text, self.context.text)
