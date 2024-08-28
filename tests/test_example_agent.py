@@ -18,7 +18,7 @@ class TestExampleAgent(unittest.IsolatedAsyncioTestCase):
         description = self.agent.describe()
         self.assertEqual(description["name"], "example-agent")
         self.assertEqual(description["role"], "Manages text state")
-        self.assertEqual(len(description["actions"]), 3)
+        self.assertEqual(len(description["actions"]), 4)
 
     def test_perform_action(self):
         """Test the agent can perform an action."""

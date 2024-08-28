@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import logging
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from modlink import Agent, Action
 
@@ -25,6 +25,7 @@ class AgentArgParser:
         )
         for action in self.actions:
             command = action["properties"]["action"]["value"]
+            command = action["properties"]["action"]["value"]
             required_fields = action.get("required", [])
             subparser = self.subparsers.add_parser(
                 name=command,
@@ -43,23 +44,9 @@ class AgentArgParser:
                 elif "anyOf" in prop_details or "oneOf" in prop_details:
                     # Handling Optional and Literal cases
                     sub_schemas = prop_details.get("anyOf") or prop_details.get("oneOf")
-                    possible_types = [
-                        self._get_arg_type(schema["type"])
-                        for schema in sub_schemas
-                        if "type" in schema and schema["type"] != "null"
-                    ]
-
-                    # If Literal (enum), get choices
-                    if len(possible_types) == 1:
-                        arg_type = possible_types[0]
-                    else:
-                        arg_type = Union[tuple(possible_types)]
-
-                    enum_schema = next(
-                        (schema for schema in sub_schemas if "enum" in schema), None
+                    arg_type, choices = self._resolve_of_choices(
+                        definitions, sub_schemas
                     )
-                    if enum_schema:
-                        choices = enum_schema["enum"]
                 elif "allOf" in prop_details:
                     ref = prop_details["allOf"][0]["$ref"]
                     arg_type = str
@@ -76,6 +63,34 @@ class AgentArgParser:
                     required=prop_name in required_fields,
                     choices=choices,
                 )
+
+    def _resolve_of_choices(
+        self, definitions: Dict, details: Dict
+    ) -> Tuple[type, List[str]]:
+        possible_types = []
+        choices = None
+        for schema in details:
+            if "$ref" in schema:
+                # Resolve the reference using the definitions object
+                ref_name = schema["$ref"].split("/")[-1]
+                resolved_schema = definitions.get(ref_name, {})
+                if "type" in resolved_schema:
+                    possible_types.append(self._get_arg_type(resolved_schema["type"]))
+                if "enum" in resolved_schema:
+                    choices = resolved_schema["enum"]
+            elif "type" in schema and schema["type"] != "null":
+                possible_types.append(self._get_arg_type(schema["type"]))
+            if "enum" in schema:
+                choices = schema["enum"]
+
+        if not possible_types:
+            raise ValueError(f"No valid types found for {details}.")
+        elif len(possible_types) == 1:
+            arg_type = possible_types[0]
+        else:
+            logging.info(f"Multiple types found, using Union. {possible_types}")
+            arg_type = Union[tuple(possible_types)]
+        return (arg_type, choices)
 
     def _resolve_enum_definitions(self, ref: str, definitions: Dict) -> List[str]:
         ref_key = ref.split("/")[-1]
@@ -115,9 +130,10 @@ class AgentArgParser:
         logging.info(f"Performing action: {filtered_args}")
         return self.agent.action_from_dict(filtered_args)
 
-    def parse_and_perform(self):
+    def parse_and_perform(self) -> Any:
         action = self.parse_args()
         if action is not None:
             return self.agent.perform(action)
         else:
             logging.error(f"Unable to parse action {action}")
+            return None

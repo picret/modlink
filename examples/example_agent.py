@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional
 from pydantic import Field
 
@@ -27,6 +28,7 @@ class ExampleAgent(mk.Agent[ExampleContext]):
             ReplaceAction,
             ConcatAction,
             PadAction,
+            CaseAction,
         )
 
 
@@ -39,7 +41,6 @@ class ReplaceAction(mk.Action):
 
     def perform(self, context: ExampleContext) -> str:
         context._text = self.text
-        print(f"Text result: {context._text}")
         return context._text
 
 
@@ -52,7 +53,6 @@ class ConcatAction(mk.Action):
 
     def perform(self, context: ExampleContext) -> str:
         context._text += self.text
-        print(f"Action result: {context._text}")
         return context._text
 
 
@@ -79,14 +79,45 @@ class PadAction(mk.Action):
     )
 
     def perform(self, context: ExampleContext) -> str:
-        text = context._text
         if self.start and self.start > 0:
-            text = self.text * self.start + text
+            context._text = self.text * self.start + context._text
         if self.end and self.end > 0:
-            text = text + self.text * self.end
-        context._text = text
+            context._text = context._text + self.text * self.end
+        return context._text
 
-        print(f"Padded text result: {text}")
+
+class CaseOperation(Enum):
+    UPPER = "upper"
+    LOWER = "lower"
+    TITLE = "title"
+    CAPITALIZE = "capitalize"
+    SWAPCASE = "swapcase"
+    CASEFOLD = "casefold"
+
+
+@mk.action_name(
+    name="case",
+    description="Changes the case of the text.",
+)
+class CaseAction(mk.Action):
+    operation: Optional[CaseOperation] = Field(
+        default=CaseOperation.UPPER,
+        description="The type of operation to perform on the text.",
+    )
+
+    def perform(self, context: ExampleContext) -> str:
+        if self.operation == CaseOperation.UPPER:
+            context._text = context._text.upper()
+        elif self.operation == CaseOperation.LOWER:
+            context._text = context._text.lower()
+        elif self.operation == CaseOperation.TITLE:
+            context._text = context._text.title()
+        elif self.operation == CaseOperation.CAPITALIZE:
+            context._text = context._text.capitalize()
+        elif self.operation == CaseOperation.SWAPCASE:
+            context._text = context._text.swapcase()
+        elif self.operation == CaseOperation.CASEFOLD:
+            context._text = context._text.casefold()
         return context._text
 
 
