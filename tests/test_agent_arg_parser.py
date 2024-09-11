@@ -64,6 +64,20 @@ class TestAgentArgParser(unittest.TestCase):
         text: str = self.parser.parse_and_perform()
         self.assertEqual(text, "INITIAL STATE")
 
+    @patch(
+        "argparse.ArgumentParser.parse_args",
+        return_value=Namespace(action="breaker", width=20),
+    )
+    def test_case_action_integer_enum_parameters(self, _):
+        """Test that replace action is parsed correctly when context is present."""
+        context = ExampleContext()
+        context.text = "This is a long text that should be broken into lines"
+        self.agent.attach(context)
+        text: str = self.parser.parse_and_perform()
+        self.assertEqual(
+            text, "This is a long\ntext that should\nbe broken into\nlines"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
