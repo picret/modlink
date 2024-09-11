@@ -49,8 +49,7 @@ class AgentArgParser:
                     )
                 elif "allOf" in prop_details:
                     ref = prop_details["allOf"][0]["$ref"]
-                    arg_type = str
-                    choices = self._resolve_enum_definitions(ref, definitions)
+                    arg_type, choices = self._resolve_enum_definitions(ref, definitions)
                 else:
                     raise ValueError(
                         f"Unsupported property '{prop_name}', {prop_details}"
@@ -92,12 +91,12 @@ class AgentArgParser:
             arg_type = Union[tuple(possible_types)]
         return (arg_type, choices)
 
-    def _resolve_enum_definitions(self, ref: str, definitions: Dict) -> List[str]:
+    def _resolve_enum_definitions(self, ref: str, definitions: Dict) -> Tuple[type, List[Any]]:
         ref_key = ref.split("/")[-1]
         if ref_key in definitions:
             ref_def = definitions[ref_key]
             ref_options = ref_def.get("enum", [])
-            return ref_options
+            return (self._get_arg_type(ref_def["type"]), ref_options)
         else:
             raise ValueError(f"Reference '{ref}' not found in definitions.")
 
