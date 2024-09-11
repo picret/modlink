@@ -27,7 +27,7 @@ class BreakerAction(Action):
 
         if self.width == BreakerWidth.EXTREME:
             result_lines = words
-        else:            
+        else:
             current_line = []
             total_chars = 0
             for word in words:
@@ -44,4 +44,3 @@ class BreakerAction(Action):
         text = "\n".join(result_lines)
         context.text = text
         return text
-    

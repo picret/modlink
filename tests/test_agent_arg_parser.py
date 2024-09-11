@@ -74,7 +74,9 @@ class TestAgentArgParser(unittest.TestCase):
         context.text = "This is a long text that should be broken into lines"
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
-        self.assertEqual(text, "This is a long\ntext that should\nbe broken into\nlines")
+        self.assertEqual(
+            text, "This is a long\ntext that should\nbe broken into\nlines"
+        )
 
 
 if __name__ == "__main__":

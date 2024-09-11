@@ -91,7 +91,9 @@ class AgentArgParser:
             arg_type = Union[tuple(possible_types)]
         return (arg_type, choices)
 
-    def _resolve_enum_definitions(self, ref: str, definitions: Dict) -> Tuple[type, List[Any]]:
+    def _resolve_enum_definitions(
+        self, ref: str, definitions: Dict
+    ) -> Tuple[type, List[Any]]:
         ref_key = ref.split("/")[-1]
         if ref_key in definitions:
             ref_def = definitions[ref_key]
