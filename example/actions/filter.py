@@ -28,7 +28,7 @@ class FilterAction(Action):
         default=[],
         description="Array of filter types to use on the text.",
     )
-    
+
     def perform(self, context: ExampleContext) -> str:
         for word in self.words:
             context.text = context.text.replace(word, "")

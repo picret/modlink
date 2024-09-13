@@ -26,7 +26,6 @@ class ExampleAgent(Agent[ExampleContext]):
 
 if __name__ == "__main__":
     # Run with python agent.py
-    # set up logging
     logging.basicConfig(level=logging.DEBUG)
 
     agent = ExampleAgent()
