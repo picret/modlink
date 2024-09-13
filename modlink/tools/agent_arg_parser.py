@@ -31,7 +31,7 @@ class AgentArgParser:
                 name=command,
                 help=action["description"],
             )
-            definitions = action.get("$defs", {})
+            defs = action.get("$defs", {})
             properties = action["properties"]
             nargs = 1
             for prop_name, prop_details in properties.items():
@@ -45,12 +45,10 @@ class AgentArgParser:
                 elif "anyOf" in prop_details or "oneOf" in prop_details:
                     # Handling Optional and Literal cases
                     sub_schemas = prop_details.get("anyOf") or prop_details.get("oneOf")
-                    arg_type, choices, nargs = self._resolve_of_choices(
-                        definitions, sub_schemas
-                    )
+                    arg_type, choices, nargs = self._resolve_choices(defs, sub_schemas)
                 elif "allOf" in prop_details:
                     ref = prop_details["allOf"][0]["$ref"]
-                    arg_type, choices = self._resolve_enum_definitions(ref, definitions)
+                    arg_type, choices = self._resolve_enum_defs(ref, defs)
                 else:
                     raise ValueError(
                         f"Unsupported property '{prop_name}', {prop_details}"
@@ -65,39 +63,35 @@ class AgentArgParser:
                     nargs=nargs,
                 )
 
-    def _resolve_of_choices(
+    def _resolve_choices(  # noqa: C901
         self, definitions: Dict, details: Dict
     ) -> Tuple[type, List[str], int | str]:
         possible_types = []
         choices = None
         nargs = 1
+
+        def resolve_type_or_enum(ref_schema: str):
+            nonlocal possible_types, choices
+            ref_name = ref_schema.split("/")[-1]
+            resolved_schema = definitions.get(ref_name, {})
+            if "type" in resolved_schema:
+                possible_types.append(self._get_arg_type(resolved_schema["type"]))
+            if "enum" in resolved_schema:
+                choices = resolved_schema["enum"]
+
         for schema in details:
             if "$ref" in schema:
-                # Resolve the reference using the definitions object
-                ref_name = schema["$ref"].split("/")[-1]
-                resolved_schema = definitions.get(ref_name, {})
-                if "type" in resolved_schema:
-                    possible_types.append(self._get_arg_type(resolved_schema["type"]))
-                if "enum" in resolved_schema:
-                    choices = resolved_schema["enum"]
+                resolve_type_or_enum(schema)
             elif "type" in schema and schema["type"] == "array":
                 items = schema["items"]
                 nargs = "*"
                 if "$ref" in items:
-                    ref_name = items["$ref"].split("/")[-1]
-                    resolved_schema = definitions.get(ref_name, {})
-                    if "type" in resolved_schema:
-                        possible_types.append(
-                            self._get_arg_type(resolved_schema["type"])
-                        )
-                    if "enum" in resolved_schema:
-                        choices = resolved_schema["enum"]
+                    resolve_type_or_enum(items)
                 else:
                     possible_types.append(self._get_arg_type(items["type"]))
             elif "type" in schema and schema["type"] != "null":
                 arg_type = self._get_arg_type(schema["type"])
                 possible_types.append(arg_type)
-                # choices = list(arg_type)
             if "enum" in schema:
                 choices = schema["enum"]
 
@@ -109,9 +103,7 @@ class AgentArgParser:
             arg_type = Union[tuple(possible_types)]
         return (arg_type, choices, nargs)
 
-    def _resolve_enum_definitions(
-        self, ref: str, definitions: Dict
-    ) -> Tuple[type, List[Any]]:
+    def _resolve_enum_defs(self, ref: str, definitions: Dict) -> Tuple[type, List[Any]]:
         ref_key = ref.split("/")[-1]
         if ref_key in definitions:
             ref_def = definitions[ref_key]

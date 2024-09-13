@@ -23,7 +23,7 @@ class TestAgentArgParser(unittest.TestCase):
         return_value=Namespace(action="replace", text="New Text State"),
     )
     def test_replace_action_with_context(self, _):
-        """Test that replace action is parsed correctly when context is present."""
+        """Test the replace action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
         action: ReplaceAction = self.parser.parse_args()
@@ -36,7 +36,7 @@ class TestAgentArgParser(unittest.TestCase):
         return_value=Namespace(action="pad", start=3, end=1, text="x"),
     )
     def test_pad_action(self, _):
-        """Test that replace action is parsed correctly when context is present."""
+        """Test the pad action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
@@ -47,7 +47,7 @@ class TestAgentArgParser(unittest.TestCase):
         return_value=Namespace(action="pad", end=3, text=" is padded"),
     )
     def test_pad_action_optional_parameters(self, _):
-        """Test that replace action is parsed correctly when context is present."""
+        """Test the pad action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
@@ -60,7 +60,7 @@ class TestAgentArgParser(unittest.TestCase):
         return_value=Namespace(action="case", operation="upper"),
     )
     def test_case_action_enum_parameters(self, _):
-        """Test that replace action is parsed correctly when context is present."""
+        """Test the replace action is parsed correctly when context is present."""
         context = ExampleContext()
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
@@ -70,8 +70,8 @@ class TestAgentArgParser(unittest.TestCase):
         "argparse.ArgumentParser.parse_args",
         return_value=Namespace(action="breaker", width=20),
     )
-    def test_case_action_integer_enum_parameters(self, _):
-        """Test that replace action is parsed correctly when context is present."""
+    def test_breaker_action_integer_enum_parameters(self, _):
+        """Test the breaker action to read enum int types."""
         context = ExampleContext()
         context.text = "This is a long text that should be broken into lines"
         self.agent.attach(context)
@@ -79,6 +79,22 @@ class TestAgentArgParser(unittest.TestCase):
         self.assertEqual(
             text, "This is a long\ntext that should\nbe broken into\nlines"
         )
+
+    @patch(
+        "argparse.ArgumentParser.parse_args",
+        return_value=Namespace(
+            action="filter",
+            words=["Dr", "CA", "U.S.A."],
+            operations=["punctuation", "digits"],
+        ),
+    )
+    def test_filter_action_array_parameters(self, _):
+        """Test the filter action is parsed correctly when context is present."""
+        context = ExampleContext()
+        context.text = "9035 Village Dr, Yosemite Valley, CA 95389, U.S.A."
+        self.agent.attach(context)
+        text: str = self.parser.parse_and_perform()
+        self.assertEqual(text, "VillageYosemiteValley")
 
 
 if __name__ == "__main__":
