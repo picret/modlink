@@ -1,5 +1,6 @@
 from modlink import Agent, agent_name
 from modlink.tools.agent_arg_parser import AgentArgParser
+import logging
 
 from example.context import ExampleContext
 
@@ -25,6 +26,9 @@ class ExampleAgent(Agent[ExampleContext]):
 
 if __name__ == "__main__":
     # Run with python agent.py
+    # set up logging
+    logging.basicConfig(level=logging.DEBUG)
+
     agent = ExampleAgent()
     agent.attach(ExampleContext())
     result = AgentArgParser(agent).parse_and_perform()

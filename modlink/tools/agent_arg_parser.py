@@ -33,6 +33,7 @@ class AgentArgParser:
             )
             definitions = action.get("$defs", {})
             properties = action["properties"]
+            nargs = 1
             for prop_name, prop_details in properties.items():
                 arg_name = f"--{prop_name}"
                 if "action" in prop_name:
@@ -44,7 +45,7 @@ class AgentArgParser:
                 elif "anyOf" in prop_details or "oneOf" in prop_details:
                     # Handling Optional and Literal cases
                     sub_schemas = prop_details.get("anyOf") or prop_details.get("oneOf")
-                    arg_type, choices = self._resolve_of_choices(
+                    arg_type, choices, nargs = self._resolve_of_choices(
                         definitions, sub_schemas
                     )
                 elif "allOf" in prop_details:
@@ -61,13 +62,15 @@ class AgentArgParser:
                     help=prop_details.get("description", None),
                     required=prop_name in required_fields,
                     choices=choices,
+                    nargs=nargs,
                 )
 
     def _resolve_of_choices(
         self, definitions: Dict, details: Dict
-    ) -> Tuple[type, List[str]]:
+    ) -> Tuple[type, List[str], int | str]:
         possible_types = []
         choices = None
+        nargs = 1
         for schema in details:
             if "$ref" in schema:
                 # Resolve the reference using the definitions object
@@ -77,8 +80,24 @@ class AgentArgParser:
                     possible_types.append(self._get_arg_type(resolved_schema["type"]))
                 if "enum" in resolved_schema:
                     choices = resolved_schema["enum"]
+            elif "type" in schema and schema["type"] == "array":
+                items = schema["items"]
+                nargs = "*"
+                if "$ref" in items:
+                    ref_name = items["$ref"].split("/")[-1]
+                    resolved_schema = definitions.get(ref_name, {})
+                    if "type" in resolved_schema:
+                        possible_types.append(
+                            self._get_arg_type(resolved_schema["type"])
+                        )
+                    if "enum" in resolved_schema:
+                        choices = resolved_schema["enum"]
+                else:
+                    possible_types.append(self._get_arg_type(items["type"]))
             elif "type" in schema and schema["type"] != "null":
-                possible_types.append(self._get_arg_type(schema["type"]))
+                arg_type = self._get_arg_type(schema["type"])
+                possible_types.append(arg_type)
+                # choices = list(arg_type)
             if "enum" in schema:
                 choices = schema["enum"]
 
@@ -87,9 +106,8 @@ class AgentArgParser:
         elif len(possible_types) == 1:
             arg_type = possible_types[0]
         else:
-            logging.info(f"Multiple types found, using Union. {possible_types}")
             arg_type = Union[tuple(possible_types)]
-        return (arg_type, choices)
+        return (arg_type, choices, nargs)
 
     def _resolve_enum_definitions(
         self, ref: str, definitions: Dict
@@ -111,8 +129,6 @@ class AgentArgParser:
             return bool
         elif type_str == "string":
             return str
-        elif type_str == "array":
-            return lambda x: x.split(";")
         elif type_str == "null":
             return type(None)
         else:

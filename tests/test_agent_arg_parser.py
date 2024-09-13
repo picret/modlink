@@ -40,7 +40,7 @@ class TestAgentArgParser(unittest.TestCase):
         context = ExampleContext()
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
-        self.assertEqual(text, "xxxInitial statex")
+        self.assertEqual(text, f"xxx{ExampleContext.DEFAULT_TEXT}x")
 
     @patch(
         "argparse.ArgumentParser.parse_args",
@@ -51,7 +51,9 @@ class TestAgentArgParser(unittest.TestCase):
         context = ExampleContext()
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
-        self.assertEqual(text, "Initial state is padded is padded is padded")
+        self.assertEqual(
+            text, f"{ExampleContext.DEFAULT_TEXT} is padded is padded is padded"
+        )
 
     @patch(
         "argparse.ArgumentParser.parse_args",
@@ -62,7 +64,7 @@ class TestAgentArgParser(unittest.TestCase):
         context = ExampleContext()
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
-        self.assertEqual(text, "INITIAL STATE")
+        self.assertEqual(text, ExampleContext.DEFAULT_TEXT.upper())
 
     @patch(
         "argparse.ArgumentParser.parse_args",
