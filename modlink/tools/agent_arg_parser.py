@@ -33,7 +33,7 @@ class AgentArgParser:
             )
             defs = action.get("$defs", {})
             properties = action["properties"]
-            nargs = 1
+            nargs = None
             for prop_name, prop_details in properties.items():
                 arg_name = f"--{prop_name}"
                 if "action" in prop_name:
@@ -68,7 +68,7 @@ class AgentArgParser:
     ) -> Tuple[type, List[str], int | str]:
         possible_types = []
         choices = None
-        nargs = 1
+        nargs = None
 
         def resolve_type_or_enum(ref_schema: dict):
             nonlocal possible_types, choices
