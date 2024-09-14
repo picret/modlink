@@ -70,9 +70,9 @@ class AgentArgParser:
         choices = None
         nargs = 1
 
-        def resolve_type_or_enum(ref_schema: str):
+        def resolve_type_or_enum(ref_schema: dict):
             nonlocal possible_types, choices
-            ref_name = ref_schema.split("/")[-1]
+            ref_name = ref_schema["$ref"].split("/")[-1]
             resolved_schema = definitions.get(ref_name, {})
             if "type" in resolved_schema:
                 possible_types.append(self._get_arg_type(resolved_schema["type"]))
