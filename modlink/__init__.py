@@ -1,7 +1,7 @@
 # modlink/__init__.py
 
 # Do not manually edit here. This is updated by scripts/prepare_release.py.
-__version__ = "0.1.0a5"
+__version__ = "0.1.0a6"
 
 from .agent import Agent, agent_name
 from .action import Action, action_name
