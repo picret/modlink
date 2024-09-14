@@ -2,7 +2,9 @@ from modlink import Context
 
 
 class ExampleContext(Context):
-    _text: str = "Initial state"
+    DEFAULT_TEXT = "9035 Village Dr, Yosemite Valley, CA 95389, U.S.A."
+
+    _text: str = DEFAULT_TEXT
 
     @property
     def text(self) -> str:
