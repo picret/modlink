@@ -2,6 +2,7 @@ from argparse import Namespace
 import unittest
 from unittest.mock import patch
 from example.actions.replace import ReplaceAction
+from example.actions.timestamp import TimestampAction
 from example.agent import ExampleAgent
 from example.context import ExampleContext
 from modlink.tools import AgentArgParser
@@ -95,6 +96,22 @@ class TestAgentArgParser(unittest.TestCase):
         self.agent.attach(context)
         text: str = self.parser.parse_and_perform()
         self.assertEqual(text, "VillageYosemiteValley")
+
+    def test_action_with_action_field(self):
+        """Test the a word like trans-action which contains action in the field."""
+        context = ExampleContext()
+        context.text = "Today is the day."
+        self.agent.attach(context)
+        self.parser = AgentArgParser(self.agent)
+
+        result: TimestampAction = self.parser.parse_args(
+            args=[
+                "timestamp",
+                "--transaction",
+                "2024-11-01",
+            ],
+        )
+        self.assertEqual(str(result.transaction), "2024-11-01")
 
 
 if __name__ == "__main__":
