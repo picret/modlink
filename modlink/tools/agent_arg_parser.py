@@ -36,7 +36,7 @@ class AgentArgParser:
             nargs = None
             for prop_name, prop_details in properties.items():
                 arg_name = f"--{prop_name}"
-                if "action" in prop_name:
+                if "action" == prop_name:
                     # Ignore the action property since it's already handled
                     continue
                 if "type" in prop_details:
@@ -126,18 +126,31 @@ class AgentArgParser:
         else:
             raise ValueError(f"Unsupported type: {type_str}")
 
-    def parse_args(self) -> Action | None:
+    def parse_args(self, args: List[str] = None) -> Action | None:
+        """
+        Parse arguments and return the resulting Action.
+
+        Args:
+            args: List of arguments to parse. If None, sys.argv is used.
+
+        Returns:
+            Action: The parsed action or None if the action could not be parsed.
+        """
         if self.agent.context is None:
             raise RuntimeError(
                 "The agent must be attached to a context before parsing arguments."
             )
-        args = self.parser.parse_args()
-        if args.action is None:
+
+        parsed = self.parser.parse_args(args)
+        if getattr(parsed, "action", None) is None:
             self.parser.print_help()
             return None
-        filtered_args = {k: v for k, v in vars(args).items() if v is not None}
-        logging.info(f"Performing action: {filtered_args}")
-        return self.agent.action_from_dict(filtered_args)
+
+        # Filter arguments to exclude None values
+        filtered = {k: v for k, v in vars(parsed).items() if v is not None}
+
+        logging.info(f"Parsed action: {filtered}")
+        return self.agent.action_from_dict(filtered)
 
     def parse_and_perform(self) -> Any:
         action = self.parse_args()
