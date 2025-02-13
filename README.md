@@ -37,6 +37,10 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
+
+python example/agent.py concat --text " I am here now"
+INFO:root:Parsed action: {'action': 'concat', 'text': ' I am here now'}
+Action result: 9035 Village Dr, Yosemite Valley, CA 95389, U.S.A. I am here now
 ```
 
 ## Example
