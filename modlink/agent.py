@@ -1,8 +1,8 @@
 from abc import ABC
 from typing import Any, Dict, Generic, Type, TypeVar
 
-from .action import Action
-from .context import Context
+from modlink.action import Action
+from modlink.context import Context
 
 
 def agent_name(name: str, role: str):

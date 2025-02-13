@@ -1,8 +1,8 @@
 # modlink/tools/__init__.py
 
-from .action_registry import ActionRegistry
-from .agent_arg_parser import AgentArgParser
-from .agent_time import AgentTime
+from modlink.tools.action_registry import ActionRegistry
+from modlink.tools.agent_arg_parser import AgentArgParser
+from modlink.tools.agent_time import AgentTime
 
 __all__ = [
     "ActionRegistry",
