@@ -49,6 +49,9 @@ class AgentArgParser:
                 elif "allOf" in prop_details:
                     ref = prop_details["allOf"][0]["$ref"]
                     arg_type, choices = self._resolve_enum_defs(ref, defs)
+                elif "$ref" in prop_details:
+                    ref = prop_details["$ref"]
+                    arg_type, choices = self._resolve_enum_defs(ref, defs)
                 else:
                     raise ValueError(
                         f"Unsupported property '{prop_name}', {prop_details}"
