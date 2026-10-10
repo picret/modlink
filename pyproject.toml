@@ -13,6 +13,7 @@ license = "GPL-3.0-or-later"
 [tool.poetry.dependencies]
 python = "^3.10"
 pydantic = "^2.5.3"
+mcp = "^1.14.1"
 
 [tool.poetry.dev-dependencies]
 black = ">=24.8.0"
